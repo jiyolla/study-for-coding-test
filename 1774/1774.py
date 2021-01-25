@@ -3,8 +3,8 @@ import sys
 
 def solve():
     read = sys.stdin.readline
-    n = int(read())
-    points = [tuple(map(float, read().split())) for _ in range(n)]
+    n, m = map(int, read().split())
+    points = [tuple(map(int, read().split())) for _ in range(n)]
     parent = [i for i in range(n + 1)]
     size = [1 for _ in range(n + 1)]
     edges = []
@@ -31,15 +31,17 @@ def solve():
     for i, p1 in enumerate(points):
         for j, p2 in enumerate(points):
             if i != j:
-                edges.append((dist(p1, p2), i, j))
-    edges.sort()
+                edges.append((dist(p1, p2), i + 1, j + 1))
+    for _ in range(m):
+        v1, v2 = map(int, read().split())
+        union(v1, v2)
     ans = 0
-    for d, v1, v2 in edges:
+    for d, v1, v2 in sorted(edges):
         if union(v1, v2):
             ans += d
             if size[v2] == n:
                 break
-    print(ans)
+    print(f'{ans:.2f}')
 
 
 solve()
