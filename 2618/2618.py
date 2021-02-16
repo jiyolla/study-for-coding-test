@@ -1,73 +1,95 @@
 import sys
+import math
 
 
 def solve():
     read = sys.stdin.readline
     n = int(read())
     w = int(read())
-    work = [list(map(int, read().split())) for _ in range(w)]
-    # 자 생각을 해보자~
-    # 순서대로, 주어진 지점들을 방문해야 하는데, 두 경찰차의 이동거리 합이 최소가 되게 한다라.
-    # 경찰차가 한 대이면, 거리는 정해져 있고 흠
-    # 매 지점을 어느 경찰차가 방문해야할지 정해야 되는데
-    # 현재 위치도 물론 영향을 끼치지만, 그 후에 방문해야할 지점들도 영향을 끼친다.
-    # 예를 들어서, 그 후에 방문해야할 지점 중에 현재 A경찰차의 위치와 매우 가깝다면,
-    # A를 움직이는 것이 비효율적일 수도 있다는 게 보인다.
-    # 분할 정복이 될까?
-    # work[:i]는 work[:i - 1]만으로 풀 수 있나?
-    # 뒤에 오는 지점에 의해서도 영향을 받는 거 같긴 한데
-    # 아니 그냥, 저렇게 생각해보자.
-    # work[:i]에 대한 답을 알고 있다고 해보자.
-    # work[:i+1]를 풀 수 있는가?
-    # work[:i]를 알고 있다면, 경찰차들의 마지막 위치들도 알 것이다.
-    # 웅
-    # work[:i]에서 work[i]를 추가로 푸는 것
-    # work[:i-1]에서 work[i-1: i+1]를 푸는 것
-    # 이런식으로 해야겠구먼
-    # 그러면 상태값을 i,j로 정의해야겠네
-    # work[i][j]는 i번부터 j번 일까지 처리하는 데 드는 최소 시간으로 하면 될 거 같은데
-    # 이러면 시간 복잡도가 어떻게 되지?
-    # work[1][w]를 구하기 위해서는
-    # work[1][w-1]+work[w-1][w], work[1][w-2]+work[w-2][w], ..., work[1][2]+work[2][w]
-    # 를 구해야 하고
-    # 총 O(w^2)의 시간이 걸리는 거 같네
-    # w가 1000이하니까 가능하긴 하네
-    # dist[i][j]는 i번일부터 j번일까지 처리하는 데 최소로 이동하는 거리
-    dist = [[] for _ in range(w)]
-    # 아앙!! 근데 문제가 있다. 경찰차의 상태 정보도 들어가야 되네...
-    # 아니 그러면, 경찰차의 상태 정보+처리해야 되는 일까지 다 상태 정보로 넣어버리면 너무 크지 않을까...
-    # 한 경찰차 당 가능한 위치가 n^2가인데...가능한 일의 조합은 wC2이고...
-    # 거의 전수 조사랑 같은 격이 될 거 같네
-    # 브루트 포스로 하면 2^w이고 흠...
-    # 아아아!!!!
-    # 경찰차의 가능한 위치가 n^2이 아니여~, w개임 ㅋㅋㅋㅋ
-    # 엄청난 발견이군
-    # 정확히 말해서는 w ~ w+2임
-    # 아 내가 초반에 괜히 경찰차 위치 정보를 뺀 게 아니군...
-    # ㅇㅋ. 마지막으로 한번 정리해보자
-    # dist[i][j]는 i번일부터 j번일까지 처리하는 데 이동하는 최소 거리이고
-    # dist[1][w]를 구하는 게 목적인데
-    # dist[i][j]는 min(dist[1][j-1] + dist[j-1][j], dist[1][j-2] + dist[j-2][j], ..., dist[1][2] + dist[2][j])이다
-    # 바텀업으로 갈 것이냐 탑다운으로 갈 것이냐?는 거의 모든 subproblem을 해결해야 되냐에 달렸는데...
-    # 흠...min을 구하려면 해야 되는 듯
-    # 그럼 바텀업으로 가는데, 어떤식으로 올려야 착실히 쌓이지?
-    # i - j를 기준으로 쌓으면 될 것 같다.
-    # 즉, i - j가 작은 것부터 쌓으면, dist[i][j]를 구하는데 하위 문제가 아직 안 풀린 상황은 나타나지 않을 것 같다.
-    for diff in range(1, w):
-        for i in range(1, w - diff + 1):
-            # dist[i][i + diff]를 구한다
-    # 아 갑자기 또 머리 아프네..
-    # 어느 차가 간다의 정보가 어디있지..?
-    # 예를 들어서 dist[5][6]이라고 치면, 5번 일에서 6번일로 이동하는 데는 시간을 넣을텐데 음
-    # 아, 차가 두 개가 있다는 건
-    # 흠...5번에 차A가 있고, 차B는 2번에 있다고 치면, 아 미치겠네 ㅋㅋㅋㅋㅋ
-    # 이거 아닌 거 같다...
-    # 2번에서 7번 가는 방법의 정보를 어떻게 통합하지..
-    # ㅈㄴ 어렵네 스벌.
-    # 여기서 핵심적인 문제는 dist[i][j]를 구하는데, 
-    # ㅠ.
-    # 결국에는 답을 봐버렸다...
-    # 이해 된 거 같은데 구현해보자.
-    
+    # work[0]은 A의 초기 위치, work[1]은 B의 초기 위치, 사건 지점은 work[2:w+2].
+    work = [[1, 1], [n, n]] + [list(map(int, read().split())) for _ in range(w)]
+    # 어떻게 state를 정의해야 optimal substructure가 존재하게 할 수 있을까?
+    # 어떻게 이 상태에 이르렀는지와 상관없게 최적의 결정을 할 수 있게.
+    # 거꾸로 생각해보자.
+    # 마지막 지점도 방문은 해야 돼. 근데 어떤 위치에 있던 어떤 차가 방문하냐의 문제이다.
+    # 1개의 지점을 방문한 상태에서 차 한 대가 바로 마지막 지점을 방문하고 나머지는 다 나머지 차가 방문하는 것
+    # + 2개의 지점을 방문한 상태에서 
+    # + 3개의 지점을 방문한 상태에서 한 차 마지막 지점 방문...
+    # + ...
+    # + 99개 지점을 방문한 상태에서 한 차가 마지막 지점 방문
+    # 이중에서 제일 작은 것을 고르면 반드시 정답이 되는가?
+    # ㅇㅇ 있을 거 같음
+    # car_a/b[i]는 a/b차가 i번째 일까지 최적 처리 했을 때의 마지막 위치(work에서 index), 1 <= i <= w
+    # ex: car_a[1] = 0(사건1을 b차가 처리하는 게 최적일 때) or 2(사건1을 a차가 처리하는 게 최적일 때)
+    car_a = [0] + [0] * w
+    car_b = [1] + [0] * w
+    # d[i]는 i번째 일까지 최적 처리 했을 때 최소 이동거리의 합
+    # ex: d[1] = dist(work[car_a[0]], work[2]) or dist(work[car_b[0]], work[2])
+    d = [0] + [math.inf] * w
+
+    def dist(p1, p2):
+        return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
+
+    # sum_dist[i]는 1번째일부터 i번째 일까지 한 차가 연속처리 했을 때 이동하는 거리의 합
+    # 1번째일 처리는 끝났다고 가정하기에 sum_dist[1]은 0이다. 이렇게 처리한 이유는 두 차가 같은 sum_dist를 사용할 수 있기 위해서.
+    sum_dist = [0] * (w + 1)
+    for i in range(2, w + 1):
+        sum_dist[i] = sum_dist[i - 1] + dist(work[i + 1], work[i])
+
+    traceback = []
+    # i번째 일을 처리한다
+    for i in range(1, w + 1):
+        # ㅓ = 0 ~ i-1번째 일을 처리한 상태에서 한 차가 바로 i번째 일을 처리한다
+        for j in range(i):
+            # d_a/b는 j번일을 처리한 상태에서 차a/b가 i번 일을 처리하러 갈 때의 거리
+            d_a = dist(work[car_a[j]], work[i + 1])
+            d_b = dist(work[car_b[j]], work[i + 1])
+            # 둘 다 초기 위치에 있고, 첫 지점이 마지막 지점이 아닐 때는 상대가 첫 지점을 방문하는 거리를 추가해야 됨
+            # d_straight에는 1번째 일이 처리됐다고 가정하기 때문
+            if j == 0 and i > 1:
+                d_a += dist(work[car_b[0]], work[2])
+                d_b += dist(work[car_a[0]], work[2])
+            # d_straight는 선택되지 않은 차가 나머지 일을 다 처리할 때의 거리
+            # = j + 1번째 일에서 i - 1번쨰 일까지 한 차가 연속처리할 때의 이동거리
+            d_straight = sum_dist[i - 1] - sum_dist[j]
+            # print(f'i: {i}, j: {j}, d_a: {d_a}, d_b: {d_b}, d_straight: {d_straight}')
+            if d_b > d_a:
+                new_d = d_a + d_straight + d[j]
+                if new_d < d[i]:
+                    d[i] = new_d
+                    # i + 1이 work에서 i번째 일임
+                    car_a[i] = i + 1
+                    car_b[i] = i if i - j > 1 else car_b[i]
+                    # traceback[x] = (j, i, c)에 대해서
+                    # j + 1번 일부터 i번 일의 처리에 관한 것이며, i번 일을 a가 처리한다
+                    # 중간 fill in 여부는 i - j에 달림
+                    traceback.append((j, i, '1'))
+            else:
+                new_d = d_b + d_straight + d[j]
+                if new_d < d[i]:
+                    d[i] = new_d
+                    car_a[i] = i if i - j > 1 else car_a[i]
+                    car_b[i] = i + 1
+                    traceback.append((j, i, '2'))
+            # print(f'car_a: {car_a}, car_b: {car_b}, d: {d}')
+    print(d[-1])
+    # 자, 이제 traceback구현.
+    last = w
+    ans = []
+    for s, e, car in traceback[::-1]:
+        print(s, e, car)
+        if e > last:
+            continue
+        last = s
+        # last pos
+        ans.append(car)
+        # fill in
+        other_car = '1' if car == '2' else '2'
+        for i in range(e - s - 1):
+            ans.append(other_car)
+        if s == 0:
+            break
+    print('\n'.join(ans[::-1]))
+
 
 solve()
