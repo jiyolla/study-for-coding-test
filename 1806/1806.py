@@ -26,47 +26,23 @@ def solve():
     ans = math.inf
     for l in range(n):
         if acc >= s:
-            # print(f'skip: l: {l}, r: {r}, acc: {acc}')
-            acc -= seq[l]
+            ans = r - l + 1 if r - l + 1 < ans else ans
+            # print(f'skip: l: {l}, r: {r}, acc: {acc}, ans: {ans}')
             if r == l:
                 ans = 1
                 break
-            continue
-        end_reached = True
-        for nr in range(r + 1, n):
-            acc += seq[nr]
-            # print(f'l: {l}, r: {r}, nr: {nr}, acc: {acc}, ans: {ans}')
-            if acc >= s:
-                ans = nr - l + 1 if nr - l + 1 < ans else ans
-                r = nr
-                end_reached = False
+        else:
+            for nr in range(r + 1, n):
+                acc += seq[nr]
+                # print(f'l: {l}, r: {r}, nr: {nr}, acc: {acc}, ans: {ans}')
+                if acc >= s:
+                    ans = nr - l + 1 if nr - l + 1 < ans else ans
+                    r = nr
+                    break
+            else:
                 break
-        if end_reached:
-            break
         acc -= seq[l]
     print(0 if math.isinf(ans) else ans)
-    # 아 이거 굉장히 드러운데 코드가..역시 통과 못하지
-    # 왜케 복잡해졌지?
-    # 로직을 다시 한번 풀어서 말해보자.
-    # l,r로 현재 수열의 양 끝을 가리킴
-    # 수열의 길이는 그러면 쉽게 구해지고
-    # acc로 현재 수열의 합을 저장함
-    # l,r을 움직일 대마다 acc그에 맞게 수정해주면 됨
-    # 이거를 구현하기 위해서
-    # 기본적으로 가장 바깥 루프에서 l을 0에서 n-1까지 순회시킴
-    # 즉 가장 바깥 루프가 도든 것은 l이 움직이는 것
-    # 그래서 가장 바깥 루프가 돌 때는 항상 acc-=seq[l]이 수반됨
-    # 여기가지 문제 없고
-    # 루프 안에서는 어떤 일이 벌어지냐
-    # 가장 먼저 l혹시 r을 뛰어넘었는지 확인한다
-    # 언제 이런 일이 발생하지? r이 움직이지 않고 l이 증가할 때
-    # 언제 저런 일이 발생하지? 두 번째조건이나, 두 번째 조건이 충족될 때 밖에 없는데
-    # 잘보면 두 번째 조건에서 지금 체크를 해주기 때문에 이거 삭제해도 됨.
-    # 자 그리고 acc가 s를 만족하는지를 확인하는데, 만족한다면
-    # 감소시켜아하는 거니까 r움직이지 말고 l을 움직여야 됨
-    # 그래서 바로 다음 루프로 가고, 혹시 같으면 1이니까 끝난 거고
-    # 그렇지 않다하면, acc<s인거니까 r을 움직여야 됨
-    # 
 
 
 solve()

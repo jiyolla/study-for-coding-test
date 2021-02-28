@@ -39,7 +39,7 @@ def solve():
     traceback = []
     # i번째 일을 처리한다
     for i in range(1, w + 1):
-        # ㅓ = 0 ~ i-1번째 일을 처리한 상태에서 한 차가 바로 i번째 일을 처리한다
+        # j = 0 ~ i-1번째 일을 처리한 상태에서 한 차가 바로 i번째 일을 처리한다
         for j in range(i):
             # d_a/b는 j번일을 처리한 상태에서 차a/b가 i번 일을 처리하러 갈 때의 거리
             d_a = dist(work[car_a[j]], work[i + 1])

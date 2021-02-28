@@ -1,6 +1,6 @@
 def solve():
-    n = int(input())
-    cost = [list(map(int, input().split())) for _ in range(n)]
+    N = int(input())
+    cost = [list(map(int, input().split())) for _ in range(N)]
     """
     mem = {((), ()): 0}
     def dp(worker, work):
@@ -57,7 +57,7 @@ def solve():
     print(allocs_pre)
     print(dp_pre)
     """
-    # """
+    """
     # 문제가 있어. 이 방법은. 기존 방법의 탐색 순서를 조금 수정해보겠다.
     mem = {(0, ): 0}
 
@@ -79,7 +79,33 @@ def solve():
     print(dp(n, [i for i in range(n)]))
     print(len(mem))
     print(cache_hit)
+    """
     # """
+    # 문제가 있어. 이 방법은. 기존 방법의 탐색 순서를 조금 수정해보겠다.
+    mem = {(0, 0): 0}
 
+    # dp(n, work)로 해야겠다. worker를 굳이 매번 순회할 필요없는 거 같음.
+    cache_hit = 0
+
+    # work는 20비트의 표현
+    def dp(n, work):
+        nonlocal cache_hit
+        # print(f'n: {n}, work: {work}')
+        # print(f'mem: {mem}')
+        if (n, work) in mem:
+            cache_hit += 1
+            return mem[(n, work)]
+        ans = 10**4 * n
+        for i in range(N):
+            masker = 1 << i
+            if masker & work:
+                sub_cost = cost[n - 1][i] + dp(n - 1, work & ~masker)
+                ans = sub_cost if ans > sub_cost else ans
+        mem[(n, work)] = ans
+        return ans
+    print(dp(N, int('1' * N, 2)))
+    print(len(mem))
+    print(cache_hit)
+    # """
 
 solve()
