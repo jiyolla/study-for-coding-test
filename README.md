@@ -1,2 +1,1 @@
-# StudyForCodingTestWithDongbinNa
-동빈나-이코테2021강의 + 백준-단계별로 풀어보기
+# 코테 준비 다시 시작해볼까?
