@@ -3,7 +3,7 @@ import json
 import requests
 from ratelimit import limits, sleep_and_retry
 
-from .config import BASE_URL, X_AUTH_TOEKN
+from .config import BASE_URL, X_AUTH_TOKEN
 
 
 # Max 10 calls per second.
