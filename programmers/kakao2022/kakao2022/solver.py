@@ -9,9 +9,8 @@ from .grader import change_grade_preventabusediscountedlinear, change_grade_rand
 # Batch grading on the last turn
 
 def alpha_solve(problem, matching_policy, grading_policy):
-    auth_key = reset_sim(problem)['auth_key']
-    
-    users = get_user_info(auth_key)['user_info']
+    reset_sim(problem)
+    users = get_user_info()['user_info']
     grades = [0] * (len(users) + 1)
     game_results = []
 
@@ -19,44 +18,43 @@ def alpha_solve(problem, matching_policy, grading_policy):
     # Hardcoded to First Come Firt Served
     assert matching_policy == 'fcfs'
     for _ in trange(595):
-        waiting_line = get_waiting_line(auth_key)['waiting_line']
+        waiting_line = get_waiting_line()['waiting_line']
         waiting_line.sort(key=lambda item: item['from'])
-        game_results.extend(get_game_result(auth_key)['game_result'])
+        game_results.extend(get_game_result()['game_result'])
         pairs = []
         for i in range(len(waiting_line)//2):
             pairs.append([waiting_line[i]['id'], waiting_line[i + 1]['id']])
-        put_match(auth_key, pairs)
+        put_match(pairs)
     
     # Batch Grading
     if grading_policy == 'randomshuffle':
-        change_grade_randomshuffle(auth_key, grades)
+        change_grade_randomshuffle(grades)
     elif grading_policy == 'simplelinear':
-        change_grade_simplelinear(auth_key, grades, game_results)
+        change_grade_simplelinear(grades, game_results)
     elif grading_policy == 'simplequadratic':
-        change_grade_simplequadratic(auth_key, grades, game_results)
+        change_grade_simplequadratic(grades, game_results)
     elif grading_policy == 'discountedlinear':
-        change_grade_discountedlinear(auth_key, grades, game_results)
+        change_grade_discountedlinear(grades, game_results)
 
     # End simulation and return score
-    print(put_match(auth_key, []))
-    return get_score(auth_key)
+    print(put_match([]))
+    return get_score()
 
 
 # ========== Type #2 Solver ==================================================
 # Matching is dependant on grading, and thus grading happens on the fly
 
 def beta_solve(problem, matching_policy, grading_policy):
-    auth_key = reset_sim(problem)['auth_key']
-    
+    reset_sim(problem)
     MAX_GRADE_DIFF = 100
-    users = get_user_info(auth_key)['user_info']
+    users = get_user_info()['user_info']
     grades = [0] * (len(users) + 1)
 
     for _ in trange(595):
-        waiting_line = get_waiting_line(auth_key)['waiting_line']
+        waiting_line = get_waiting_line()['waiting_line']
         waiting_line.sort(key=lambda item: item['from'])
         
-        change_grade_simplelinear(auth_key, grades, get_game_result(auth_key)['game_result'])
+        change_grade_simplelinear(grades, get_game_result()['game_result'])
 
         pairs = []
         for i in range(len(waiting_line)):
@@ -65,11 +63,11 @@ def beta_solve(problem, matching_policy, grading_policy):
                     pairs.append([waiting_line[i]['id'], waiting_line[j]['id']])
                     waiting_line.pop(j)
                     break
-        print(put_match(auth_key, pairs))
+        print(put_match(pairs))
 
     # End simulation and return score
-    print(put_match(auth_key, []))
-    return get_score(auth_key)
+    print(put_match([]))
+    return get_score()
 
 
 # problem #1:
@@ -77,16 +75,15 @@ def beta_solve(problem, matching_policy, grading_policy):
 # problem #2:
 # 
 def solve_limitmaxdiff_simplelinear(problem: int):
-    auth_key = reset_sim(problem)['auth_key']
-    
+    reset_sim(problem)
     MAX_GRADE_DIFF = 100
-    users = get_user_info(auth_key)['user_info']
+    users = get_user_info()['user_info']
     grades = [0] * (len(users) + 1)
     for _ in trange(595):
-        waiting_line = get_waiting_line(auth_key)['waiting_line']
+        waiting_line = get_waiting_line()['waiting_line']
         waiting_line.sort(key=lambda item: item['from'])
         
-        change_grade_simplelinear(auth_key, grades, get_game_result(auth_key)['game_result'])
+        change_grade_simplelinear(grades, get_game_result()['game_result'])
 
         pairs = []
         for i in range(len(waiting_line)):
@@ -95,11 +92,11 @@ def solve_limitmaxdiff_simplelinear(problem: int):
                     pairs.append([waiting_line[i]['id'], waiting_line[j]['id']])
                     waiting_line.pop(j)
                     break
-        put_match(auth_key, pairs)
+        put_match(pairs)
 
     # End simulation and return score
-    print(put_match(auth_key, []))
-    return get_score(auth_key)
+    print(put_match([]))
+    return get_score()
 
 
 # problem #1:
@@ -107,16 +104,15 @@ def solve_limitmaxdiff_simplelinear(problem: int):
 # problem #2:
 # 
 def solve_limitmaxdiff_discountedlinear(problem: int):
-    auth_key = reset_sim(problem)['auth_key']
-    
+    reset_sim(problem)
     MAX_GRADE_DIFF = 600
-    users = get_user_info(auth_key)['user_info']
+    users = get_user_info()['user_info']
     grades = [0] * (len(users) + 1)
     for _ in trange(595):
-        waiting_line = get_waiting_line(auth_key)['waiting_line']
+        waiting_line = get_waiting_line()['waiting_line']
         waiting_line.sort(key=lambda item: item['from'])
         
-        change_grade_discountedlinear(auth_key, grades, get_game_result(auth_key)['game_result'])
+        change_grade_discountedlinear(grades, get_game_result()['game_result'])
 
         pairs = []
         for i in range(len(waiting_line)):
@@ -125,11 +121,11 @@ def solve_limitmaxdiff_discountedlinear(problem: int):
                     pairs.append([waiting_line[i]['id'], waiting_line[j]['id']])
                     waiting_line.pop(j)
                     break
-        put_match(auth_key, pairs)
+        put_match(pairs)
 
     # End simulation and return score
-    print(put_match(auth_key, []))
-    return get_score(auth_key)
+    print(put_match([]))
+    return get_score()
 
 
 # problem #1:
@@ -137,20 +133,19 @@ def solve_limitmaxdiff_discountedlinear(problem: int):
 # problem #2:
 # 
 def solve_limitmaxdiff_preventabusediscountedlinear(problem: int):
-    auth_key = reset_sim(problem)['auth_key']
-    
-    users = get_user_info(auth_key)['user_info']
+    reset_sim(problem)
+    users = get_user_info()['user_info']
     grades = [40000] * (len(users) + 1)
     game_records = [[] for _ in range(len(users) + 1)]
     for _ in trange(595):
-        waiting_line = get_waiting_line(auth_key)['waiting_line']
+        waiting_line = get_waiting_line()['waiting_line']
         waiting_line.sort(key=lambda item: item['from'])
         
-        game_results = get_game_result(auth_key)['game_result']
+        game_results = get_game_result()['game_result']
         for game_result in game_results:
             game_records[game_result['win']].append(1)
             game_records[game_result['lose']].append(0)
-        change_grade_preventabusediscountedlinear(auth_key, grades, game_results)
+        change_grade_preventabusediscountedlinear(grades, game_results)
 
         pairs = []
         is_waiting = [True] * len(waiting_line)
@@ -169,10 +164,10 @@ def solve_limitmaxdiff_preventabusediscountedlinear(problem: int):
                     is_waiting[j] = False
                     break
 
-        put_match(auth_key, pairs)
+        put_match(pairs)
 
     # End simulation and return score
-    print(put_match(auth_key, []))
-    print(get_score(auth_key))
+    print(put_match([]))
+    print(get_score())
     breakpoint()
-    return get_score(auth_key)
+    return get_score()
