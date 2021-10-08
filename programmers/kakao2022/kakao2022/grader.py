@@ -66,16 +66,31 @@ def change_grade_simplequadratic(grades, game_results):
     put_change_grade(commands)
 
 
-def change_grade_preventabusediscountedlinear(grades, game_results):
-    BASE_SCORE = 1000
+def change_grade_preventabusediscountedlinear(grades, game_results, suspicion_marks):
+    BASE_SCORE = 4000
     MIN_TAKEN = 3
     MAX_TAKEN = 40
     changed_users_id = set()
     for game_result in game_results:
-        changed_users_id.add(game_result['win'])
-        changed_users_id.add(game_result['lose'])
-        grades[game_result['win']] += BASE_SCORE*(2 - 1.5*(game_result['taken'] - MIN_TAKEN)/(MAX_TAKEN - MIN_TAKEN))
-        grades[game_result['lose']] -= BASE_SCORE*(2 - 1.5*(game_result['taken'] - MIN_TAKEN)/(MAX_TAKEN - MIN_TAKEN))
+        winner = game_result['win']
+        loser = game_result['lose']
+        game_time = game_result['taken']
+
+        changed_users_id.add(winner)
+        changed_users_id.add(loser)
+
+        if game_time < 11:
+            expected_game_time = 40 - abs(grades[winner] - grades[loser])/99000*35
+            tolerance = 5 + 5
+            if game_time < expected_game_time - tolerance:
+                suspicion_marks[loser] += 1
+
+            if suspicion_marks[loser] > 2:
+                continue
+        expected_win_rate = grades[winner]/(grades[winner] + grades[loser])
+        win_rate_modifier = expected_win_rate # (expected_win_rate - 0.3)*2 + 0.2
+        grades[winner] += win_rate_modifier*BASE_SCORE*(3 - 2.5*(game_time - MIN_TAKEN)/(MAX_TAKEN - MIN_TAKEN))
+        grades[loser] -= win_rate_modifier*BASE_SCORE*(3 - 2.5*(game_time - MIN_TAKEN)/(MAX_TAKEN - MIN_TAKEN))
     
     commands = []
     for changed_user_id in changed_users_id:

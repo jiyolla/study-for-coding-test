@@ -137,6 +137,7 @@ def solve_limitmaxdiff_preventabusediscountedlinear(problem: int):
     users = get_user_info()['user_info']
     grades = [40000] * (len(users) + 1)
     game_records = [[] for _ in range(len(users) + 1)]
+    suspicion_marks = [0] * (len(users) + 1)
     for _ in trange(595):
         waiting_line = get_waiting_line()['waiting_line']
         waiting_line.sort(key=lambda item: item['from'])
@@ -145,19 +146,20 @@ def solve_limitmaxdiff_preventabusediscountedlinear(problem: int):
         for game_result in game_results:
             game_records[game_result['win']].append(1)
             game_records[game_result['lose']].append(0)
-        change_grade_preventabusediscountedlinear(grades, game_results)
+        change_grade_preventabusediscountedlinear(grades, game_results, suspicion_marks)
 
         pairs = []
         is_waiting = [True] * len(waiting_line)
         for i in range(len(waiting_line)):
             for j in range(i + 1, len(waiting_line)):
-                # Lock max biased win rate by estimation at 60%
+                # Lock max biased win rate by estimation at 70%
                 if (
-                    max(grades[waiting_line[i]['id']], grades[waiting_line[j]['id']])
-                    / (grades[waiting_line[i]['id']] + grades[waiting_line[j]['id']])
-                    < 0.6
-                    and is_waiting[i]
+                    is_waiting[i]
                     and is_waiting[j]
+                    and abs(grades[waiting_line[i]['id']] - grades[waiting_line[j]['id']]) < 10000
+                    # and max(grades[waiting_line[i]['id']], grades[waiting_line[j]['id']])
+                    # / (grades[waiting_line[i]['id']] + grades[waiting_line[j]['id']])
+                    # < 0.7
                 ):
                     pairs.append([waiting_line[i]['id'], waiting_line[j]['id']])
                     is_waiting[i] = False

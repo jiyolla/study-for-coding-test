@@ -19,7 +19,7 @@ def main():
     #         f.write(f'alpha_solve({p!r}, {matching_policy!r}, {grading_policy!r}): ')
     #         f.write(f'{result}')
     # print(solve_limitmaxdiff_preventabusediscountedlinear(1))
-    print(solve_limitmaxdiff_preventabusediscountedlinear(2))
+    print(solve_limitmaxdiff_preventabusediscountedlinear(1))
 
         
 if __name__ == '__main__':
